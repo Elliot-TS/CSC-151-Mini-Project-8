@@ -8,19 +8,38 @@
 
 #| Paragraph Struct |#
 
-;;; (paragraph sentences) -> paragraph?
+;;; (paragraph-kernel sentences) -> paragraph?
 ;;;   sentences: list? of sentences?
 ;;; Struct for storing information about each paragraph
-(struct paragraph (sentences))
+
+(struct paragraph-kernel (sentences))
+
+;;; /// check if each element in list should be string . fix later
+(define paragraph
+  (lambda (sentences)
+    (cond
+      [(not (list? sentences))
+       (error "paragraph not sentences")]
+      [else
+       (sentences)])))
 
 
 #| Sentence Struct |#
-
-;;; (sentence words) -> sentence?
+;;; (sentence-kernel words) -> sentence?
 ;;;   words : list? of word?
 ;;; Struct for storing information about each sentence
-(struct sentence (words))
 
+(struct sentence-kernel (words))
+
+
+;;;/// each member of list should be str
+(define sentence
+  (lambda (sentences)
+    (cond
+      [(not (list? sentences))
+       (error "sentence not words")]
+      [else
+       (sentence-kernel sentences)])))
 
 
 #| Word Struct |#
@@ -29,7 +48,19 @@
 ;;;   str : string?
 ;;;   conjuclention : conjuclention?
 ;;; Creates a word struct
-(struct word (str conjuclention))
+(struct word-kernel (str conjuclention))
+
+(define word
+  (lambda (wordstr conjuclention)
+    (cond
+      [(not (string? wordstr))
+       (error "word : expected string" wordstr)]
+      [(not (conjuclention-kernel? conjuclention))
+       (error "word : expected conjuclention" conjuclention)]
+      [else
+       (word-kernel wordstr conjuclention)])))
+; (word "cat" (conjuclention "noun" (declention "singular" "female" "objective")))
+;;; not currently working but it will. 
 
 
 
@@ -41,8 +72,22 @@
 ;;;       (pronouns count as nouns)
 ;;;   conjucline : declention? or conjugation? or #f
 ;;; Stores information about a words part of speech and conjugation or declention
-(struct conjuclention (part-of-speech conjucline))
+(struct conjuclention-kernel (part-of-speech conjucline))
 
+(define conjuclention
+  (lambda (part-of-speech conjucline)
+    (cond
+      [(not (or (equal? "verb" part-of-speech)
+                (equal? "noun" part-of-speech)))
+       (error "conjucline : part of speech" part-of-speech)]
+      [(not (or (declention-kernel? conjuclention)
+                (conjugation-kernel? conjuclention)))
+      (error "conjucline : conjuclention" conjucline)] ; hitting an error on this.....
+      [else
+       (conjuclention-kernel part-of-speech conjucline)])))
+
+(define sample-conjuc-verb (conjuclention "verb" (conjugation "third" "plural" "past")))
+;(test-true "conjuclention verb" (conjuclention-kernel? sample-conjuc-verb))
 
 
 #| Declention Struct |#
@@ -63,8 +108,25 @@
 ;;;   * Possessive case is used for possession
 ;;;     - "That's his cake."
 ;;;     - "That cake is his."
-(struct declention (number gender case))
+(struct declention-kernel (number gender case))
 
+(define declention
+  (lambda (number gender case)
+    (cond
+      [(not (or (equal? "singular" number)
+                (equal? "plural" number)))
+       (error "declention : number" number)]
+      [(not (or (equal? "male" gender)
+                (equal? "female" gender)))
+       (error "declention : gender" gender)]
+      [(not (or (equal? "possessive" case)
+                (equal? "objective" case)))
+       (error "declention : case" case)]
+      [else
+       (declention-kernel number gender case)])))
+
+(define sample-dec (declention "singular" "female" "possessive"))
+(test-true "sample declention" (declention-kernel? sample-dec))
 
 
 #| Conjugation Struct |#
@@ -74,8 +136,26 @@
 ;;;   number : 'singular or 'plural
 ;;;   tense : 'past or 'present
 ;;; Stores information about a verb's conjugation
-(struct conjugation (person number tense))
+(struct conjugation-kernel (person number tense))
 
+(define conjugation
+  (lambda (person number tense)
+    (cond
+      [(not (or (equal? "first" person)
+                (equal? "second" person)
+                (equal? "third" person)))
+       (error "conjugation : person" person)]
+      [(not (or (equal? "singular" number)
+                (equal? "plural" number)))
+       (error "conjugation : number" number)]
+      [(not (or (equal? "past" tense)
+                (equal? "present" tense)))
+       (error "conjugation : tense" tense)]
+      [else
+       (conjugation-kernel person number tense)])))
+
+(define sample-con (conjugation "first" "singular" "present"))
+(test-true "sample conjugation" (conjugation-kernel? sample-con))
 
 
 #| IDENTIFYING PARAGRAPHS, SENTENCES, AND WORDS |#
