@@ -92,10 +92,10 @@
     (cond
       [(not (or (equal? "verb" part-of-speech)
                 (equal? "noun" part-of-speech)))
-       (error "conjuclention: part-of-speech contract violation.  Given: " part-of-speech)]
-      [(not (or (declention-kernel? conjucline)
-                (conjugation-kernel? conjucline)))
-      (error "conjuclention : conjucline contract violation.  Given: " conjucline)] ; hitting an error on this.....
+       (error "conjucline : part of speech" part-of-speech)]
+      [(not (or (declention-kernel? conjuclention)
+                (conjugation-kernel? conjuclention)))
+      (error "conjucline : conjuclention" conjucline)] ; hitting an error on this.....
       [else
        (conjuclention-kernel part-of-speech conjucline)])))
 
