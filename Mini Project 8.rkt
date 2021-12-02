@@ -324,4 +324,111 @@
 
 #| WORD ANALYSIS |#
 
+;;; (file->verb-dictioary filename)
+;;;   filename : string? that is a valid file name
+;;; filename should be formatted as follows
+;;;   base1,present_simple1,past_simple1,past_participle1,present_participle1   
+;;;   base2,present_simple2,past_simple2,past_participle2,present_participle2   
+;;;   ...
+;;; Dictionay hash will be formatted as follows
+;;;   '#hash(
+;;;     (base . (...list_of_base_verbs...)) ; (base form is infinitive and 1st/2nd present smple)
+;;;     (present-simple . (...list_of_present_simple_verbs...)) ; (only 3rd person)
+;;;     (past-simple . (...list_of_past_simple_verbs...))
+;;;     (past-participle . (...list_of_past_participle_verbs...))
+;;;     (present-participle . (...list_of_present_participle_verbs...)))
+
+
+
+
+;;; (file->noun-dictionary filename) -> hash?
+;;;   filename : string? that is a valid file name
+;;; filename should be formatted as follows
+;;;   word1_singular,word1_plural
+;;;   word2_singular,word2_plural
+;;;   ...
+;;; (e.g. https://raw.githubusercontent.com/djstrong/nouns-with-plurals/master/noun.csv)
+;;; Dictionary hash  will be formatted as follows
+;;;   '#hash(
+;;;     (singular . (...list_of_singular_nouns...)
+;;;     (plural . (...list_of_plural_nouns...))))
+
+
+
+
+;;; (file->pronouns-dictionary personal-pronouns other-pronouns) -> hash?
+;;;   personal-pronouns : string? that is a valid file name
+;;;   other-pronouns : string? that is a valid file name
+;;; personal-pronouns should be formatted as follows
+;;;   i,me,my,mine,myself
+;;;   we,us,out,ours,ourself
+;;;   thou,thee,thy,thine,thineself
+;;;   you,you,your,yours,yourself
+;;;   ye,you,your,yours,yourself
+;;;   he,him,his,his,himself
+;;;   she,her,her,hers,herself
+;;;   it,it,its,--,itself
+;;;   they,them,their,theirs,themselves
+;;; other-pronouns should be formatted as follows
+;;;   indefinite1,indefinite2,...
+;;;   demonstrative1,demonstrative2,...
+;;;   interrogative1,interrogative2,...
+;;;   relative1,relative2,...
+;;; Dictioary hash will be formatted as follows
+;;;   '#hash(
+;;;     (1S . (nominative objective possessive-adjective possessive reflexive)) ; (1st singular)
+;;;     (1P . (nominative objective possessive-adjective possessive reflexive)) ; (1st plural)
+;;;     (2AS . (nominative objective possessive-adjective possessive reflexive)) ; (2nd archaic singular) 
+;;;     (2S . (nominative objective possessive-adjective possessive reflexive)) ; (2nd singular)
+;;;     (2P . (nominative objective possessive-adjective possessive reflexive)) ; (2nd plural)
+;;;     (3M . (nominative objective possessive-adjective possessive reflexive)) ; (3rd masculine singular)
+;;;     (3F . (nominative objective possessive-adjective possessive reflexive)) ; (3rd feminine singular)
+;;;     (3N . (nominative objective possessive-adjective possessive reflexive)) ; (3rd neuter singular)
+;;;     (3P . (nominative objective possessive-adjective possessive reflexive)) ; (3rd plural)
+;;;     (indefinite . (...list_of_indefinite_pronouns...))
+;;;     (demonstrative . (...list_of_demonstrative_pronouns...))
+;;;     (interrogative . (...list_of_interrogative_pronouns...))
+;;;     (relative . (...list_of_relative_pronouns...)))
+
+
+
+
+;;; (file->other-dictionary adjectives adverbs prepositions cojuctions interjections)
+;;;    all parameters : string? that is a valid file name
+;;; All files should be formatted as a new-line separated list of words
+;;; TODO Add articles (the, an, a) to adjective list
+;;; Dictionary hash will be formatted as follows
+;;;   '#hash(
+;;;     (adjective . (...list_of_adjectives...))
+;;;     (adverb . (...list_of_adverbs...))
+;;;     (preposition . (...list_of_prepositions...))
+;;;     (interjection . (...list_of_interjectios...)))
+
+
+
+
+;;; (string->noun str dictionary) -> word? with noun properties
+;;;   str : string? that is one word
+;;;   dictionary : hash? formatted as noun dictionary
+;;; If the given word is in the noun dictionary, it returns a word
+;;;  struct with noun properties.  Othwerise, it returns #f
+
+
+
+
+;;; (string->verb str dictionary)
+;;;
+;;;
+
+
+
+
+;;; (string->pronoun str dictionary)
+;;;
+;;;
+
+
+
+
+;;; TODO Rewrite string->word to work using the above functions as well as the other words dictionary
 #| OPTIONAL: SENTENCE ANALYSIS |#
