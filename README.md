@@ -6,3 +6,4 @@ Google Docs Link: https://docs.google.com/document/d/1LDHSP-roitYI_wGvrAqIjI_6QA
 
 Acknowledgements:
  - Verb Dictionary taken from https://github.com/monolithpl/verb.forms.dictionary
+ - Adjective, Adverb, Conjunction, Interjection and Preposition Dictionaries taken from https://github.com/verachell/English-word-lists-parts-of-speech-approximate/tree/main/other-categories
