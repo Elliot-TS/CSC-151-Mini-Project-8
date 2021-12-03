@@ -433,14 +433,21 @@
 ;;; (file->other-dictionary adjectives adverbs prepositions cojuctions interjections)
 ;;;    all parameters : string? that is a valid file name
 ;;; All files should be formatted as a new-line separated list of words
-;;; TODO Add articles (the, an, a) to adjective list
+;;; The articles (the, an, a) have been added to the adjective list file.
 ;;; Dictionary hash will be formatted as follows
 ;;;   '#hash(
 ;;;     (adjective . (...list_of_adjectives...))
 ;;;     (adverb . (...list_of_adverbs...))
+;;;     (conjunction . (...list_of_conjunctions...))
 ;;;     (preposition . (...list_of_prepositions...))
 ;;;     (interjection . (...list_of_interjectios...)))
-
+(define file->other-dictionarys
+  (lambda (adjective-filename adverb-filename preposition-filename conjunction-filename interjection-filename)
+    (hash 'adjective (file->lines adjective-filename)
+          'adverb (file->lines adverb-filename)
+          'conjunction (file->lines conjunction-filename)
+          'interjection (file->lines interjection-filename)
+          'preposition (file->lines preposition-filename))))
 
 
 
