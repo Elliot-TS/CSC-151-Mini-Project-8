@@ -376,7 +376,10 @@
 ;;;   '#hash(
 ;;;     (singular . (...list_of_singular_nouns...)
 ;;;     (plural . (...list_of_plural_nouns...))))
-
+(define file->noun-dictionary
+  (lambda (filename)
+    (hash 'singular (csv->column-list filename 0)
+          'plural (csv->column-list filename 1))))
 
 
 
@@ -384,13 +387,15 @@
 ;;;   personal-pronouns : string? that is a valid file name
 ;;;   other-pronouns : string? that is a valid file name
 ;;; personal-pronouns should be formatted as follows
-;;;   i,me,my,mine,myself,we,us,out,ours,ourself
-;;;   thou,thee,thy,thine,thineself,ye,you,your,yours,yourself
-;;;   you,you,your,yours,yourself,you,you,your,yours,yourself
-;;;   he,him,his,his,himself,they,them,their,theirs,themselves
+;;;   i,me,my,mine,myself
+;;;   we,us,out,ours,ourself
+;;;   thou,thee,thy,thine,thineself
+;;;   you,you,your,yours,yourself
+;;;   ye,you,your,yours,yourself
+;;;   he,him,his,his,himself
 ;;;   she,her,her,hers,herself
 ;;;   it,it,its,--,itself
-;;;   
+;;;   they,them,their,theirs,themselves
 ;;; other-pronouns should be formatted as follows
 ;;;   indefinite1,indefinite2,...
 ;;;   demonstrative1,demonstrative2,...
@@ -411,21 +416,6 @@
 ;;;     (demonstrative . (...list_of_demonstrative_pronouns...))
 ;;;     (interrogative . (...list_of_interrogative_pronouns...))
 ;;;     (relative . (...list_of_relative_pronouns...)))
-(define file->pronouns-dictionary
-  (lambda (personal-pronouns other-pronouns)
-    (hash '1S (csv->column-list personal-pronouns 0)
-          '1P (csv->column-list personal-pronouns 1)
-          '2AS (csv->column-list personal-pronouns 2)
-          '2S (csv->column-list personal-pronouns 3)
-          '2P (csv->column-list personal-pronouns 4)
-          '3M (csv->column-list personal-pronouns 5)
-          '3F (csv->column-list personal-pronouns 6)
-          '3N (csv->column-list personal-pronouns 7)
-          '3P (csv->column-list personal-pronouns 8)
-          'indefinite (csv->column-list other-pronouns 0)
-          'demonstrative (csv->column-list other-pronouns 1)
-          'interrogative (csv->column-list other-pronouns 2)
-          'relative (csv->column-list other-pronouns 3))))
 
 
 
@@ -433,21 +423,14 @@
 ;;; (file->other-dictionary adjectives adverbs prepositions cojuctions interjections)
 ;;;    all parameters : string? that is a valid file name
 ;;; All files should be formatted as a new-line separated list of words
-;;; The articles (the, an, a) have been added to the adjective list file.
+;;; TODO Add articles (the, an, a) to adjective list
 ;;; Dictionary hash will be formatted as follows
 ;;;   '#hash(
 ;;;     (adjective . (...list_of_adjectives...))
 ;;;     (adverb . (...list_of_adverbs...))
-;;;     (conjunction . (...list_of_conjunctions...))
 ;;;     (preposition . (...list_of_prepositions...))
 ;;;     (interjection . (...list_of_interjectios...)))
-(define file->other-dictionarys
-  (lambda (adjective-filename adverb-filename preposition-filename conjunction-filename interjection-filename)
-    (hash 'adjective (file->lines adjective-filename)
-          'adverb (file->lines adverb-filename)
-          'conjunction (file->lines conjunction-filename)
-          'interjection (file->lines interjection-filename)
-          'preposition (file->lines preposition-filename))))
+
 
 
 
@@ -456,7 +439,6 @@
 ;;;   dictionary : hash? formatted as noun dictionary
 ;;; If the given word is in the noun dictionary, it returns a word
 ;;;  struct with noun properties.  Othwerise, it returns #f
-
 
 
 
