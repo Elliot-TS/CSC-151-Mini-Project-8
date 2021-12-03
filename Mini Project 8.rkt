@@ -4,6 +4,7 @@
 (require rackunit)
 (require rackunit/text-ui)
 
+
 ;;; CSC-151 - Rebelsky
 ;;; Mini Project 8: Sentence and Word Analysis
 ;;; Date: November 19 - December 5
@@ -362,6 +363,8 @@
           'past-participle (csv->column-list filename 3)
           'present-participle (csv->column-list filename 4))))
 
+(define verb-dictionary (file->verb-dictionary "verbs-dictionary.csv"))
+
 
 
 
@@ -411,6 +414,7 @@
           'demonstrative (csv->column-list other-pronouns 1)
           'interrogative (csv->column-list other-pronouns 2)
           'relative (csv->column-list other-pronouns 3))))
+(define pronoun-dictionary (file->pronouns-dictionary "personal-pronouns.csv" "other-pronouns.csv"))
 
 
 
@@ -430,6 +434,7 @@
   (lambda (filename)
     (hash 'singular (csv->column-list filename 0)
           'plural (csv->column-list filename 1))))
+(define noun-dictionary (file->noun-dictionary "noun-dictionary.csv"))
 
 
 
@@ -445,13 +450,19 @@
 ;;;     (conjunction . (...list_of_conjunctions...))
 ;;;     (preposition . (...list_of_prepositions...))
 ;;;     (interjection . (...list_of_interjectios...)))
-(define file->other-dictionarys
+(define file->other-dictionary
   (lambda (adjective-filename adverb-filename preposition-filename conjunction-filename interjection-filename)
     (hash 'adjective (file->lines adjective-filename)
           'adverb (file->lines adverb-filename)
           'conjunction (file->lines conjunction-filename)
           'interjection (file->lines interjection-filename)
           'preposition (file->lines preposition-filename))))
+(define other-dictionary
+  (file->other-dictionary "adjectives.txt"
+                          "adverbs.txt"
+                          "prepositions.txt"
+                          "conjunctions.txt"
+                          "interjections.txt"))
 
 
 
