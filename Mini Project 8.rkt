@@ -365,21 +365,6 @@
 
 
 
-;;; (file->noun-dictionary filename) -> hash?
-;;;   filename : string? that is a valid file name
-;;; filename should be formatted as follows
-;;;   word1_singular,word1_plural
-;;;   word2_singular,word2_plural
-;;;   ...
-;;; (e.g. https://raw.githubusercontent.com/djstrong/nouns-with-plurals/master/noun.csv)
-;;; Dictionary hash  will be formatted as follows
-;;;   '#hash(
-;;;     (singular . (...list_of_singular_nouns...)
-;;;     (plural . (...list_of_plural_nouns...))))
-
-
-
-
 ;;; (file->pronouns-dictionary personal-pronouns other-pronouns) -> hash?
 ;;;   personal-pronouns : string? that is a valid file name
 ;;;   other-pronouns : string? that is a valid file name
@@ -445,6 +430,28 @@
   (lambda (filename)
     (hash 'singular (csv->column-list filename 0)
           'plural (csv->column-list filename 1))))
+
+
+
+
+;;; (file->other-dictionary adjectives adverbs prepositions cojuctions interjections)
+;;;    all parameters : string? that is a valid file name
+;;; All files should be formatted as a new-line separated list of words
+;;; The articles (the, an, a) have been added to the adjective list file.
+;;; Dictionary hash will be formatted as follows
+;;;   '#hash(
+;;;     (adjective . (...list_of_adjectives...))
+;;;     (adverb . (...list_of_adverbs...))
+;;;     (conjunction . (...list_of_conjunctions...))
+;;;     (preposition . (...list_of_prepositions...))
+;;;     (interjection . (...list_of_interjectios...)))
+(define file->other-dictionarys
+  (lambda (adjective-filename adverb-filename preposition-filename conjunction-filename interjection-filename)
+    (hash 'adjective (file->lines adjective-filename)
+          'adverb (file->lines adverb-filename)
+          'conjunction (file->lines conjunction-filename)
+          'interjection (file->lines interjection-filename)
+          'preposition (file->lines preposition-filename))))
 
 
 
