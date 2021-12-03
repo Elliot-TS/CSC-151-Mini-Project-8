@@ -338,7 +338,7 @@
 (define csv->column-list
   (lambda (filename column-num)
     (map (lambda (line)
-           (string-trim (list-ref (string-split line #px"[\t,]") column-num)))
+           (string-trim (list-ref (string-split line #px"[\t,]" #:trim? #f) column-num)))
          (file->lines filename))))
 
 ;;; (file->verb-dictioary filename)
@@ -384,15 +384,13 @@
 ;;;   personal-pronouns : string? that is a valid file name
 ;;;   other-pronouns : string? that is a valid file name
 ;;; personal-pronouns should be formatted as follows
-;;;   i,me,my,mine,myself
-;;;   we,us,out,ours,ourself
-;;;   thou,thee,thy,thine,thineself
-;;;   you,you,your,yours,yourself
-;;;   ye,you,your,yours,yourself
-;;;   he,him,his,his,himself
+;;;   i,me,my,mine,myself,we,us,out,ours,ourself
+;;;   thou,thee,thy,thine,thineself,ye,you,your,yours,yourself
+;;;   you,you,your,yours,yourself,you,you,your,yours,yourself
+;;;   he,him,his,his,himself,they,them,their,theirs,themselves
 ;;;   she,her,her,hers,herself
 ;;;   it,it,its,--,itself
-;;;   they,them,their,theirs,themselves
+;;;   
 ;;; other-pronouns should be formatted as follows
 ;;;   indefinite1,indefinite2,...
 ;;;   demonstrative1,demonstrative2,...
@@ -413,6 +411,21 @@
 ;;;     (demonstrative . (...list_of_demonstrative_pronouns...))
 ;;;     (interrogative . (...list_of_interrogative_pronouns...))
 ;;;     (relative . (...list_of_relative_pronouns...)))
+(define file->pronouns-dictionary
+  (lambda (personal-pronouns other-pronouns)
+    (hash '1S (csv->column-list personal-pronouns 0)
+          '1P (csv->column-list personal-pronouns 1)
+          '2AS (csv->column-list personal-pronouns 2)
+          '2S (csv->column-list personal-pronouns 3)
+          '2P (csv->column-list personal-pronouns 4)
+          '3M (csv->column-list personal-pronouns 5)
+          '3F (csv->column-list personal-pronouns 6)
+          '3N (csv->column-list personal-pronouns 7)
+          '3P (csv->column-list personal-pronouns 8)
+          'indefinite (csv->column-list other-pronouns 0)
+          'demonstrative (csv->column-list other-pronouns 1)
+          'interrogative (csv->column-list other-pronouns 2)
+          'relative (csv->column-list other-pronouns 3))))
 
 
 
