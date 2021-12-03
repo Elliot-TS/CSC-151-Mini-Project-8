@@ -4,6 +4,13 @@
 (require rackunit)
 (require rackunit/text-ui)
 
+;;; CSC-151 - Rebelsky
+;;; Mini Project 8: Sentence and Word Analysis
+;;; Date: November 19 - December 5
+;;; Names: Elliot Swaim, Jules Wood, Matilda Carne, Nifemi Ogunmesa
+;;; Acknowledgements:
+;;;   - Verb forms dictionary taken from https://github.com/monolithpl/verb.forms.dictionary
+
 #| STRUCTS FOR PARAGRAPHS, SENTENCES, WORDS, AND conjuclentions |#
 
 #| Conjugation Struct |#
@@ -95,7 +102,7 @@
        (error "conjuclention: part-of-speech contract violation.  Given: " part-of-speech)]
       [(not (or (declention-kernel? conjucline)
                 (conjugation-kernel? conjucline)))
-      (error "conjuclention : conjucline contract violation.  Given: " conjucline)] ; hitting an error on this.....
+       (error "conjuclention : conjucline contract violation.  Given: " conjucline)] ; hitting an error on this.....
       [else
        (conjuclention-kernel part-of-speech conjucline)])))
 
@@ -257,14 +264,14 @@
     (let* ([parsep1 "\n\n"]
            [parsep2 "\n\t"]
            [rex-letter (rex-repeat-0 (rex-char-antiset "\n"))])
-     (map string-trim (rex-find-matches (rex-concat rex-letter
-                                    (rex-any-of (rex-string "\n")
-                                                rex-letter)
-                                    (rex-repeat (rex-char-antiset parsep2))
-                                    (rex-any-of (rex-string parsep1)
-                                                (rex-string parsep2)))
-                        (string-append str
-                                       parsep1))))))
+      (map string-trim (rex-find-matches (rex-concat rex-letter
+                                                     (rex-any-of (rex-string "\n")
+                                                                 rex-letter)
+                                                     (rex-repeat (rex-char-antiset parsep2))
+                                                     (rex-any-of (rex-string parsep1)
+                                                                 (rex-string parsep2)))
+                                         (string-append str
+                                                        parsep1))))))
 
 (test-equal? "a singular paragraph"
              (string->paragraph-list "i'm a little paragraph. ok.")
@@ -323,6 +330,16 @@
 
 
 #| WORD ANALYSIS |#
+;;; (csv->column-list filename column-num) -> list? of string?
+;;;   filename : string? that is a valid file name
+;;;   column-num : integer?
+;;; Returns a list of the values in the given column
+;;; column-num = 0 gives the first column
+(define csv->column-list
+  (lambda (filename column-num)
+    (map (lambda (line)
+           (string-trim (list-ref (string-split line #px"[\t,]") column-num)))
+         (file->lines filename))))
 
 ;;; (file->verb-dictioary filename)
 ;;;   filename : string? that is a valid file name
@@ -337,6 +354,13 @@
 ;;;     (past-simple . (...list_of_past_simple_verbs...))
 ;;;     (past-participle . (...list_of_past_participle_verbs...))
 ;;;     (present-participle . (...list_of_present_participle_verbs...)))
+(define file->verb-dictionary
+  (lambda (filename)
+    (hash 'base (csv->column-list filename 0)
+          'present-simple (csv->column-list filename 1)
+          'past-simple (csv->column-list filename 2)          
+          'past-participle (csv->column-list filename 3)
+          'present-participle (csv->column-list filename 4))))
 
 
 
