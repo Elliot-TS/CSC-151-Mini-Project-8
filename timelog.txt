@@ -1,0 +1,146 @@
+Hour 1
+Elliot  21 Nov 2021     15     group meeting
+Elliot  21 Nov 2021     30     group meeting
+Elliot  21 Nov 2021     45     group meeting
+Elliot  21 Nov 2021     60     group meeting
+Hour 2
+Elliot  21 Nov 2021     15     group meeting
+Elliot  22 Nov 2021     30     setting up github page
+Elliot  22 Nov 2021     45     outlining code
+Elliot  22 Nov 2021     60     finishing outlining code
+Hour 3
+Elliot  24 Nov 2021     15     part 1 work
+Elliot  24 Nov 2021     30     part 1 work
+Elliot  24 Nov 2021     45     part 1 work
+Elliot  24 Nov 2021     60     part 1 work
+Hour 4
+Elliot  30 Nov 2021     15     group meeting
+Elliot  30 Nov 2021     30     group meeting
+Elliot  30 Nov 2021     45     group meeting
+Elliot  31 Dec 2021     60     fixed structs
+Hour 5
+Elliot  31 Nov 2021     15     outlining part 2
+Elliot  31 Nov 2021     30     outlining part 2
+Elliot  31 Nov 2021     45     outlining part 2
+Elliot  31 Nov 2021     60     outlining part 2
+Hour 6
+Elliot  2 Dec 2021     15     Worked on file->verb-dictionary
+Elliot  2 Dec 2021     30     Worked on file->verb-dictionary
+Elliot  2 Dec 2021     45     Worked on file->pronoun-dictionary
+Elliot  2 Dec 2021     60     Worked on file->pronoun-dictionary
+Hour 7
+Elliot  3 Dec 2021     15     github work
+Elliot  3 Dec 2021     30     github work
+Elliot  5 Dec 2021     45     group meeting: wrapping up
+Elliot  5 Dec 2021     60     group meeting: wrapping up
+Hour 8
+Elliot  5 Dec 2021     15     group meeting: wrapping up
+Elliot  5 Dec 2021     30     group meeting: wrapping up
+Elliot  5 Dec 2021     15     group meeting: wrapping up
+Elliot  5 Dec 2021     30     group meeting: wrapping up
+
+
+Hour 1
+Nifemi  21 Nov 2021     15     group meeting
+Nifemi  21 Nov 2021     30     group meeting
+Nifemi  21 Nov 2021     45     group meeting
+Nifemi  21 Nov 2021     60     group meeting
+Hour 2
+Nifemi  21 Nov 2021     15     group meeting
+Nifemi  24 Nov 2021     30     part 1 work
+Nifemi  24 Nov 2021     45     part 1 work
+Nifemi  24 Nov 2021     60     part 1 work
+Hour 3
+Nifemi  24 Nov 2021     15     part 1 work
+Nifemi  30 Nov 2021     30     group meeting
+Nifemi  30 Nov 2021     45     group meeting
+Nifemi  30 Nov 2021     60     group meeting
+Hour 4
+Nifemi  2  Dec 2021     15     make-noun dictionary hash
+Nifemi  2  Dec 2021     30     working on in-dictionary?
+Nifemi  2  Dec 2021     45     working on word->noun
+Nifemi  2  Dec 2021     60     working on word->noun
+Hour 5
+Nifemi  4 Dec 2021     15     group meeting
+Nifemi  4 Dec 2021     30     group meeting
+Nifemi  4 Dec 2021     45     group meeting
+Nifemi  4 Dec 2021     60     group meeting
+Hour 6
+Nifemi  5 Dec 2021     15     group meeting: wrapping up
+Nifemi  5 Dec 2021     30     group meeting: wrapping up
+Nifemi  5 Dec 2021     45     group meeting: wrapping up
+Nifemi  5 Dec 2021     60     group meeting: wrapping up
+Hour 7
+Nifemi  5 Dec 2021     15     group meeting: wrapping up
+Nifemi  5 Dec 2021     30     group meeting: wrapping up
+
+Hour 1
+Jules  21 Nov 2021     15     group meeting
+Jules  21 Nov 2021     30     group meeting
+Jules  21 Nov 2021     45     group meeting
+Jules  21 Nov 2021     60     group meeting
+Hour 2
+Jules  21 Nov 2021     15     group meeting
+Jules  28 Nov 2021     30     designing struct kernels
+Jules  28 Nov 2021     45     testing structs
+Jules  28 Nov 2021     60     working on struct errors
+Hour 3  
+Jules  30 Nov 2021     15     group meeting
+Jules  30 Nov 2021     30     group meeting
+Jules  30 Nov 2021     45     group meeting
+Jules  2  Dec 2021     60     fixing structs to have documentation
+Hour 4
+Jules  2  Dec 2021     15     adding error messages to structs
+Jules  2  Dec 2021     30     fixing structs to check if inputs are accurate
+Jules  4  Dec 2021     45     working on in->dictionary procedure
+Jules  4  Dec 2021     60     working on fixing in-dictionary prode
+Hour 5
+Jules  4 Dec 2021     15     group meeting
+Jules  4 Dec 2021     30     group meeting
+Jules  4 Dec 2021     45     group meeting
+Jules  5 Dec 2021     60     group meeting: wrapping up
+Hour 6
+Jules  5 Dec 2021     15     group meeting: wrapping up
+Jules  5 Dec 2021     30     group meeting: wrapping up
+Jules  5 Dec 2021     45     group meeting: wrapping up
+Jules  5 Dec 2021     60     group meeting: wrapping up
+Hour 7
+Jules  5 Dec 2021     15     group meeting: wrapping up
+Jules  5 Dec 2021     30     group meeting: wrapping up
+
+
+Hour 1
+Matilda  21 Nov 2021     15    group meeting 
+Matilda  21 Nov 2021     35    group meeting 
+Matilda  21 Nov 2021     45    group meeting 
+Matilda  21 Nov 2021     60    group meeting 
+Hour 2
+Matilda  21 Nov 2021     15     group meeting
+Matilda  28 Nov 2021     30     finding dictionaries
+Matilda  28 Nov 2021     45     finding dictionaries
+Matilda  28 Nov 2021     60     finding dictionaries
+Hour 3
+Matilda  28 Nov 2021     15     finding dictionaries
+Matilda  30 Nov 2021     30     group meeting
+Matilda  30 Nov 2021     45     group meeting
+Matilda  30 Nov 2021     60     group meeting
+Hour 4
+Matilda  2  Dec 2021     15     working on file->verb-dictionary
+Matilda  2  Dec 2021     30     working on file->other-dictionaries
+Matilda  2  Dec 2021     45     working on file->other-dictionaries
+Matilda  2  Dec 2021     60     adding dictionary files to github
+Hour 5
+Matilda  4 Dec 2021     15     group meeting
+Matilda  4 Dec 2021     30     group meeting
+Matilda  4 Dec 2021     45     group meeting
+Matilda  4 Dec 2021     60     group meeting
+Hour 6
+Matilda  5 Dec 2021     15     working on string->words
+Matilda  5 Dec 2021     30     working on string->words, and verb struct
+Matilda  5 Dec 2021     45     group meeting: wrapping up
+Matilda  5 Dec 2021     60     group meeting: wrapping up
+Hour 7
+Matilda  5 Dec 2021     60     group meeting: wrapping up
+Matilda  5 Dec 2021     60     group meeting: wrapping up
+Matilda  5 Dec 2021     60     group meeting: wrapping up
+Matilda  5 Dec 2021     60     group meeting: wrapping up
