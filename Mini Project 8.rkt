@@ -11,6 +11,288 @@
 ;;; Names: Elliot Swaim, Jules Wood, Matilda Carne, Nifemi Ogunmesa
 ;;; Acknowledgements:
 ;;;   - Verb forms dictionary taken from https://github.com/monolithpl/verb.forms.dictionary
+;;;   - Adjective, Adverb, Conjunction, Interjection and Preposition Dictionaries taken from https://github.com/verachell/English-word-lists-parts-of-speech-approximate/tree/main/other-categories
+;;;   - Noun dictionary taken from https://github.com/djstrong/nouns-with-plurals
+;;;   - Edgar Allen Poe (The Raven) for the sample text
+
+#|
+
+User's Guide
+Word analysis
+Input a word, output a struct which includes:
+* the given word
+* the part of speech
+* additional characteristics if applicable to part of speech
+* (so with nouns, will tell if it was singular or plural)
+* we use dictionaries
+* it can also look at larger text bodies
+
+Can input word of specific type if noun/verb/pronoun to get description:
+> (string->verb "leverage")
+(word-kernel "leverage" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+
+> (string->noun "egg")
+(word-kernel "egg" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+
+> (string->pronoun "her")
+(word-kernel "her" (conjuclention-kernel "pronoun" (declention-kernel "singular" "feminine" '())))
+
+
+
+
+
+Can input word without telling type and have it find type of word:
+
+>  (string->word "cats")
+(word-kernel "cats" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))
+
+> (string->word "crunchy")
+(word-kernel "crunchy" (conjuclention-kernel "adjective" '()))
+
+> (string->word "jumping")
+(word-kernel "jumping" (conjuclention-kernel "verb" (conjugation-kernel 'present-participle)))
+
+> (string->word "sakhkjhdjkahskjh")
+(word-kernel "sakhkjhdjkahskjh" (conjuclention-kernel "unknown" '()))
+
+
+
+Can work on longer strings of words:
+
+> (string->sentence "this is an example sentence, that should have some nouns and some verbs.")
+(sentence-kernel
+ (list
+  (word-kernel "this" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "is" (conjuclention-kernel "verb" (conjugation-kernel 'present-simple)))
+  (word-kernel "an" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "example" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "sentence" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "that" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "should" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "have" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+  (word-kernel "some" (conjuclention-kernel "indefinite pronoun" (declention-kernel '() '() '())))
+  (word-kernel "nouns" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))
+  (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+  (word-kernel "some" (conjuclention-kernel "indefinite pronoun" (declention-kernel '() '() '())))
+  (word-kernel "verbs" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))))
+
+
+can work on a file
+
+> (file->paragraphs "sample-text.txt")
+(paragraph-kernel
+ (list
+  (sentence-kernel
+   (list
+    (word-kernel "once" (conjuclention-kernel "adverb" '()))
+    (word-kernel "upon" (conjuclention-kernel "preposition" '()))
+    (word-kernel "a" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "midnight" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "dreary" (conjuclention-kernel "adjective" '()))
+    (word-kernel "while" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "pondered" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "weak" (conjuclention-kernel "adjective" '()))
+    (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "weary" (conjuclention-kernel "verb" (conjugation-kernel 'base)))))
+  (sentence-kernel
+   (list
+    (word-kernel "over" (conjuclention-kernel "adjective" '()))
+    (word-kernel "many" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "a" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "quaint" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "curious" (conjuclention-kernel "adjective" '()))
+    (word-kernel "volume" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "of" (conjuclention-kernel "preposition" '()))
+    (word-kernel "forgotten" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "lore" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "while" (conjuclention-kernel "preposition" '()))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "nodded" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "nearly" (conjuclention-kernel "adverb" '()))
+    (word-kernel "napping" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "suddenly" (conjuclention-kernel "adverb" '()))
+    (word-kernel "there" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "came" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "a" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "tapping" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "as" (conjuclention-kernel "preposition" '()))
+    (word-kernel "of" (conjuclention-kernel "preposition" '()))
+    (word-kernel "some" (conjuclention-kernel "indefinite pronoun" (declention-kernel '() '() '())))
+    (word-kernel "one" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "gently" (conjuclention-kernel "adverb" '()))
+    (word-kernel "rapping" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "rapping" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "at" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "chamber" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "door" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "tis" (conjuclention-kernel "unknown" '()))
+    (word-kernel "some" (conjuclention-kernel "indefinite pronoun" (declention-kernel '() '() '())))
+    (word-kernel "visitor" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "muttered" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "tapping" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "at" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "chamber" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "door" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "only" (conjuclention-kernel "adjective" '()))
+    (word-kernel "this" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "nothing" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "more" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "ah" (conjuclention-kernel "unknown" '()))
+    (word-kernel "distinctly" (conjuclention-kernel "adverb" '()))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "remember" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "it" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "was" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "in" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "bleak" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "december" (conjuclention-kernel "unknown" '()))))
+  (sentence-kernel
+   (list
+    (word-kernel "and" (conjuclention-kernel "conjunction" '()))
+    (word-kernel "each" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "separate" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "dying" (conjuclention-kernel "verb" (conjugation-kernel 'present-participle)))
+    (word-kernel "ember" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "wrought" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "its" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))
+    (word-kernel "ghost" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "upon" (conjuclention-kernel "preposition" '()))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "floor" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "eagerly" (conjuclention-kernel "adverb" '()))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "wished" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "morrow" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "vainly" (conjuclention-kernel "adverb" '()))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "had" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "sought" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "to" (conjuclention-kernel "adverb" '()))
+    (word-kernel "borrow" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "from" (conjuclention-kernel "preposition" '()))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "books" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))
+    (word-kernel "surcease" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "of" (conjuclention-kernel "preposition" '()))
+    (word-kernel "sorrow" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "sorrow" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "for" (conjuclention-kernel "preposition" '()))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "lost" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "lenore" (conjuclention-kernel "unknown" '()))))
+  (sentence-kernel
+   (list
+    (word-kernel "for" (conjuclention-kernel "preposition" '()))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "rare" (conjuclention-kernel "adjective" '()))
+    (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "radiant" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "maiden" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "whom" (conjuclention-kernel "interrogative pronoun" (declention-kernel '() '() '())))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "angels" (conjuclention-kernel "noun" (declention-kernel "plural" '() '())))
+    (word-kernel "name" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "lenore" (conjuclention-kernel "unknown" '()))))
+  (sentence-kernel
+   (list
+    (word-kernel "nameless" (conjuclention-kernel "adjective" '()))
+    (word-kernel "here" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "for" (conjuclention-kernel "preposition" '()))
+    (word-kernel "evermore" (conjuclention-kernel "adverb" '()))))
+  (sentence-kernel
+   (list
+    (word-kernel "and" (conjuclention-kernel "conjunction" '()))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "silken" (conjuclention-kernel "adjective" '()))
+    (word-kernel "sad" (conjuclention-kernel "adjective" '()))
+    (word-kernel "uncertain" (conjuclention-kernel "adjective" '()))
+    (word-kernel "rustling" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "of" (conjuclention-kernel "preposition" '()))
+    (word-kernel "each" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "purple" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "curtain" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "thrilled" (conjuclention-kernel "unknown" '()))
+    (word-kernel "me" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "filled" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "me" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "with" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "fantastic" (conjuclention-kernel "adjective" '()))
+    (word-kernel "terrors" (conjuclention-kernel "unknown" '()))
+    (word-kernel "never" (conjuclention-kernel "adverb" '()))
+    (word-kernel "felt" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "before" (conjuclention-kernel "adverb" '()))))
+  (sentence-kernel
+   (list
+    (word-kernel "so" (conjuclention-kernel "adjective" '()))
+    (word-kernel "that" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "now" (conjuclention-kernel "adverb" '()))
+    (word-kernel "to" (conjuclention-kernel "adverb" '()))
+    (word-kernel "still" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "the" (conjuclention-kernel "adjective" '()))
+    (word-kernel "beating" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "of" (conjuclention-kernel "preposition" '()))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "heart" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "i" (conjuclention-kernel "unknown" '()))
+    (word-kernel "stood" (conjuclention-kernel "verb" (conjugation-kernel 'past-simple)))
+    (word-kernel "repeating" (conjuclention-kernel "verb" (conjugation-kernel 'present-participle)))))
+  (sentence-kernel
+   (list
+    (word-kernel "tis" (conjuclention-kernel "unknown" '()))
+    (word-kernel "some" (conjuclention-kernel "indefinite pronoun" (declention-kernel '() '() '())))
+    (word-kernel "visitor" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "entreating" (conjuclention-kernel "verb" (conjugation-kernel 'present-participle)))
+    (word-kernel "entrance" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "at" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "chamber" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "door" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "some" (conjuclention-kernel "adverb" '()))
+    (word-kernel "late" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "visitor" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "entreating" (conjuclention-kernel "verb" (conjugation-kernel 'present-participle)))
+    (word-kernel "entrance" (conjuclention-kernel "verb" (conjugation-kernel 'base)))
+    (word-kernel "at" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "my" (conjuclention-kernel "pronoun" (declention-kernel "singular" '() '())))
+    (word-kernel "chamber" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "door" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))
+  (sentence-kernel
+   (list
+    (word-kernel "this" (conjuclention-kernel "adverb" '()))
+    (word-kernel "it" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "is" (conjuclention-kernel "verb" (conjugation-kernel 'present-simple)))
+    (word-kernel "and" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "nothing" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))
+    (word-kernel "more" (conjuclention-kernel "noun" (declention-kernel "singular" '() '())))))))
+
+
+|#
 
 #| STRUCTS FOR PARAGRAPHS, SENTENCES, WORDS, AND conjuclentions |#
 
@@ -37,9 +319,9 @@
 #| Declention Struct |#
 
 ;;; (declention number gender case) -> declention?
-;;;   number : 'singular or 'plural
-;;;   gender : 'masculine, 'feminine, or 'neuter (default is 'neuter)
-;;;   case : 'nominative, 'objective, or 'possessive (default is 'nominative)
+;;;   number : "singular" or "plural"
+;;;   gender : "masculine", "feminine", or "neuter" (default is "neuter")
+;;;   case : 'nominative, 'objective, or 'possessive (not implemented)
 ;;; Stores information about a noun's (or pronoun's) declention
 ;;; Note:
 ;;;   * Nominative case is for subjects and complements
@@ -52,23 +334,27 @@
 ;;;   * Possessive case is used for possession
 ;;;     - "That's his cake."
 ;;;     - "That cake is his."
-(struct declention-kernel (number)
+(struct declention-kernel (number gender case)
   #:transparent)
 
 (define declention
-  (lambda (number)
+  (lambda (number [gender null] [case null])
     (cond
       [(not (or (equal? "singular" number)
-                (equal? "plural" number)))
+                (equal? "plural" number)
+                (null? number)))
        (error "declention : number" number)]
-      ;   [(not (or (equal? "male" gender)
-      ;             (equal? "female" gender)))
-      ;  (error "declention : gender" gender)]
-      ;  [(not (or (equal? "possessive" case)
-      ;           (equal? "objective" case)))
-      ; (error "declention : case" case)]
+         [(not (or (equal? "masculine" gender)
+                   (equal? "feminine" gender)
+                   (equal? "neuter" gender)
+                   (null? gender)))
+        (error "declention : gender" gender)]
+        [(not (or (equal? "possessive" case)
+                 (equal? "objective" case)
+                 (null? case)))
+       (error "declention : case" case)]
       [else
-       (declention-kernel number)])))
+       (declention-kernel number gender case)])))
 
 (define sample-dec (declention "singular"))
 (test-true "sample declention" (declention-kernel? sample-dec))
@@ -78,8 +364,8 @@
 
 ;;; (conjuclention part-of-speech conjucline) -> conjuclention?
 ;;;   part-of-speech : one of:
-;;;       'noun, 'verb, 'adjective, 'adverb, 'preposition, 'conjunction, 'interjection, or #f
-;;;       (pronouns count as nouns)
+;;;       'noun, 'verb, 'adjective, 'adverb, 'pronoun, 'preposition, 'conjunction, 'interjection, or #f
+;;;       (various types of pronouns also have distinct part-of-speech names, e.g. "relative pronoun")
 ;;;   conjucline : declention? or conjugation? or #f
 ;;; Stores information about a words part of speech and conjugation or declention
 (struct conjuclention-kernel (part-of-speech conjucline)
@@ -89,21 +375,14 @@
 (define conjuclention
   (lambda (part-of-speech conjucline)
     (cond
-      [(not (or (equal? "verb" part-of-speech)
-                (equal? "noun" part-of-speech)))
+      [(not (string? part-of-speech))
        (error "conjuclention: part-of-speech contract violation.  Given: " part-of-speech)]
       [(not (or (declention-kernel? conjucline)
-                (conjugation-kernel? conjucline)))
-       (error "conjuclention : conjucline contract violation.  Given: " conjucline)] ; hitting an error on this.....
+                (conjugation-kernel? conjucline)
+                null))
+       (error "conjuclention : conjucline contract violation.  Given: " conjucline)] 
       [else
        (conjuclention-kernel part-of-speech conjucline)])))
-
-
-
-(define sample-conjuc-verb (conjuclention "verb" (conjugation 'past-simple)))
-;(test-true "conjuclention verb" (conjuclention-kernel? sample-conjuc-verb))
-
-
 
 #| Word Struct |#
 
@@ -124,7 +403,6 @@
        (error "word : expected conjuclention" conjuclention)]
       [else
        (word-kernel wordstr conjuclention)])))
-; (word "cat" (conjuclention "noun" (declention "singular" "female" "objective")))
 
 
 
@@ -142,11 +420,9 @@
            (all-strings? (cdr lst))]
           [else #f])))
 
-;;; tests - these are done to check accuracy but also make sure speed is not too slow
-
-(test-true "long string list true" (all-strings? (make-list 2000 "cat")))
+(test-true "long string list true" (all-strings? (make-list 20 "cat")))
 (test-false "not all elements strings" (all-strings? '("cat" "kitten" 65)))
-(test-false "no elements strings" (all-strings? (make-list 2000 54)))
+(test-false "no elements strings" (all-strings? (make-list 20 54)))
 
 ;;; (sentence-kernel words) -> sentence?
 ;;;   words : list? of word?
@@ -164,8 +440,6 @@
     (cond
       [(not (list? sentences))
        (error "sentence not word list")]
-      [(not (all-strings? sentences))
-       (error "sentence list not all words")]
       [else
        (sentence-kernel sentences)])))
 
@@ -188,11 +462,9 @@
   (lambda (sentences)
     (cond
       [(not (list? sentences))
-       (error "paragraph not sentences")]
-      [(not (all-strings? sentences))
-       (error "sentences not strings")]
+       (error "paragraph not sentences.  Given: " sentences)]
       [else
-       (sentences)])))
+       (paragraph-kernel sentences)])))
 
 
 
@@ -207,7 +479,7 @@
 ;;; TODO: Make this actually word (during part two)
 (define string->conjuclention
   (lambda (str)
-    (declention 'singular 'neuter 'nominative)))
+    (declention "singular" "neuter" 'nominative)))
 
 
 ;;; (string->words-list str) -> list? of string?
@@ -265,6 +537,9 @@
              (string->sentences-list "I'm going to test this sentence")
              '("I'm going to test this sentence\n"))
 
+
+
+
 ;;; (string->paragraph-list str) -> list-of-string?
 ;;;    str : s(test-equal? "a singular paragraph"
 ;;; breaks apart string into its paragraphs
@@ -299,6 +574,8 @@
              (string->paragraph-list "I'm a little tea pot.\n short and stout")
              '("I'm a little tea pot.\n short and stout"))
 
+
+
 ;;; (string->sentence str) -> sentence?
 ;;;   str : string?
 ;;; Converts a string into a sentence struct.
@@ -307,28 +584,16 @@
   (lambda (str)
     (sentence (map string->word (string->words-list str)))))
 
-;;; (string->paragraph str) -> paragraph?
-;;;   str : string?
-;;; Converts a string to a paragraph struct.
-;;;  Assumes str contains only one paragraph.
-(define string->paragraph
-  (lambda (str)
-    (paragraph (map string->sentence (string->sentences-list str)))))
 
-;;; (file->paragraph filename) -> paragraph?
-;;;   filename : string? that is a valid text file name
-;;; Converts the text in a document into a paragraph struct.
-;;;  Assumes file contains only one paragraph.
-(define file->paragraph
-  (lambda (filename)
-    (string->paragraph (file->string filename))))
 
 ;;; (string->paragraphs str) -> list? of paragraph?
 ;;;   str : string?
 ;;; Creates a list of paragraphs contained within the string
 (define string->paragraphs
   (lambda (str)
-    (map paragraph (string->paragraph-list str))))
+    (paragraph (map string->sentence (string->sentences-list str)))))
+
+
 
 
 ;;; (file->paragraphs filename) -> list? of paragraph?
@@ -337,6 +602,23 @@
 (define file->paragraphs
   (lambda (filename)
     (string->paragraphs (file->string filename))))
+
+;;; (string->paragraph str) -> paragraph?
+;;;   str : string?
+;;; Converts a string to a paragraph struct.
+;;;  Assumes str contains only one paragraph.
+(define string->paragraph
+  (lambda (str)
+    (paragraph (string->paragraph-list str))))
+
+
+;;; (file->paragraph filename) -> paragraph?
+;;;   filename : string? that is a valid text file name
+;;; Converts the text in a document into a paragraph struct.
+;;;  Assumes file contains only one paragraph.
+(define file->paragraph
+  (lambda (filename)
+    (string->paragraph (file->string filename))))
 
 
 #| WORD ANALYSIS |#
@@ -382,7 +664,7 @@
 ;;;   other-pronouns : string? that is a valid file name
 ;;; personal-pronouns should be formatted as follows
 ;;;   i,we,thou,you,ye,he,she,it,they
-;;;   me,us,thee,you,you,him,her,it,them
+;;;   me,us,thee,you,y'all,him,her,it,them
 ;;;   my,our,thy,your,your,his,her,its,their
 ;;;   mine,ours,thine,yours,yours,his,hers,,theirs
 ;;;   myself,ourselves,thyself,yourself,yourselves,himself,herself,itself,themselves
@@ -441,8 +723,8 @@
 ;;;     (plural . (...list_of_plural_nouns...))))
 (define file->noun-dictionary
   (lambda (filename)
-    (hash 'singular (csv->column-list filename 0)
-          'plural (csv->column-list filename 1))))
+    (hash "singular" (csv->column-list filename 0)
+          "plural" (csv->column-list filename 1))))
 (define noun-dictionary (file->noun-dictionary "noun-dictionary.csv"))
 
 
@@ -483,9 +765,9 @@
 ;;;  struct with noun properties.  Othwerise, it returns #f
 (define string->noun
   (lambda (str)
-    (cond [(number? (index-of (hash-ref noun-dictionary 'plural) str))
+    (cond [(number? (index-of (hash-ref noun-dictionary "plural") str))
            (word str (conjuclention "noun" (declention "plural")))]
-          [(number? (index-of (hash-ref noun-dictionary 'singular) str))
+          [(number? (index-of (hash-ref noun-dictionary "singular") str))
            (word str (conjuclention "noun" (declention "singular")))]
           [else #f])))
 
@@ -520,32 +802,32 @@
 ;;; takes a word and determines if it is a pronoun.
 (define string->pronoun
   (lambda (str)
-    (cond [(equal? str (hash-ref pronoun-dictionary '1S))
-           (list str '1S)]
-          [(equal? str (hash-ref pronoun-dictionary '1P))
-           (list str '1P)]
-          [(equal? str (hash-ref pronoun-dictionary '2AS))
-           (list str '2AS)]
-          [(equal? str (hash-ref pronoun-dictionary '2S))
-           (list str '2S)]
-          [(equal? str (hash-ref pronoun-dictionary '2P))
-           (list str '2P)]
-          [(equal? str (hash-ref pronoun-dictionary '3M))
-           (list str '3M)]
-          [(equal? str (hash-ref pronoun-dictionary '3F))
-           (list str '3F)]
-          [(equal? str (hash-ref pronoun-dictionary '3N))
-           (list str '3N)]
-          [(equal? str (hash-ref pronoun-dictionary '3P))
-           (list str '3P)]
-          [(equal? str (hash-ref pronoun-dictionary 'indefinite))
-           (list str 'indefinite)]
-          [(equal? str (hash-ref pronoun-dictionary 'demonstrative))
-           (list str 'demonstrative)]
-          [(equal? str (hash-ref pronoun-dictionary 'interrogative))
-           (list str 'interrogative)]
-          [(equal? str (hash-ref pronoun-dictionary 'relative))
-           (list str 'relative)]
+    (cond [(index-of (hash-ref pronoun-dictionary '1S) str)
+           (word str (conjuclention "pronoun" (declention "singular" null null)))]
+          [(index-of (hash-ref pronoun-dictionary '1P)  str)
+           (word str (conjuclention "pronoun" (declention "plural" null null)))]
+          [(index-of (hash-ref pronoun-dictionary '2AS)  str)
+           (word str (conjuclention "pronoun" (declention "singular" null null)))]
+          [(index-of (hash-ref pronoun-dictionary '2S)  str)
+           (word str (conjuclention "pronoun" (declention "singular" null null)))]
+          [(index-of (hash-ref pronoun-dictionary '2P)  str)
+           (word str (conjuclention "pronoun" (declention "plural" null null)))]
+          [(index-of (hash-ref pronoun-dictionary '3M)  str)
+           (word str (conjuclention "pronoun" (declention "singular" "masculine" null)))]
+          [(index-of (hash-ref pronoun-dictionary '3F)  str)
+           (word str (conjuclention "pronoun" (declention "singular" "feminine" null)))]
+          [(index-of (hash-ref pronoun-dictionary '3N)  str)
+           (word str (conjuclention "pronoun" (declention "singular" "neuter" null)))]
+          [(index-of (hash-ref pronoun-dictionary '3P)  str)
+           (word str (conjuclention "pronoun" (declention "plural" null null)))]
+          [(index-of (hash-ref pronoun-dictionary 'indefinite) str)
+           (word str (conjuclention "indefinite pronoun" (declention null null null)))]
+          [(index-of (hash-ref pronoun-dictionary 'demonstrative) str)
+           (word str (conjuclention "demonstrative pronoun" (declention null null null)))]
+          [(index-of (hash-ref pronoun-dictionary 'interrogative) str)
+           (word str (conjuclention "interrogative pronoun" (declention null null null)))]
+          [(index-of (hash-ref pronoun-dictionary 'relative) str)
+           (word str (conjuclention "relative pronoun" (declention null null null)))]
           [else
            #f])))
 
@@ -558,7 +840,8 @@
 ;;;  Assumes str contains one word
 (define string->word
   (lambda (str)
-    (let ([noun? (string->noun str)]
+    (let ([str (string-downcase str)]
+          [noun? (string->noun str)]
           [verb? (string->verb str)]
           [pronoun? (string->pronoun str)])
       (cond
@@ -571,43 +854,19 @@
         [(index-of (hash-ref other-dictionary
                              'adjective)
                    str)
-         (word "adjective" null)]
+         (word str (conjuclention "adjective" null))]
         [(index-of (hash-ref other-dictionary
                              'adverb)
                    str)
-         (word "adverb" null)]
+         (word str (conjuclention "adverb" null))]
         [(index-of (hash-ref other-dictionary
                              'preposition)
                    str)
-         (word "preposition" null)]
+         (word str (conjuclention "preposition" null))]
         [(index-of (hash-ref other-dictionary
                              'conjunction)
                    str)
-         (word "conjunction" null)]
+         (word str (conjuclention "conjunction" null))]
         [else
-         (word "unknown" null)]))))
+         (word str (conjuclention "unknown" null))]))))
 
-
-
-;;; (string->words filename) ->
-(define string->words
-  (lambda (filename)
-  (map string->word (file->paragraphs (filename)))))
-
-
-  #| OPTIONAL: SENTENCE ANALYSIS |#
-
-
-
-
-;;; DEMONSTRATIONS
-;;; could use in presentation
-#|
-
-(define samplenoun
-(string->word "cat"))
-
-> samplenoun
-(word-kernel "cat" (conjuclention-kernel "noun" (declention-kernel "singular")))
-
-|#
