@@ -5,6 +5,10 @@
 (require rackunit/text-ui)
 
 
+Main changes: conjugation struct updated
+              string->verb updated
+
+
 ;;; CSC-151 - Rebelsky
 ;;; Mini Project 8: Sentence and Word Analysis
 ;;; Date: November 19 - December 5
@@ -19,18 +23,18 @@
 ;;; (conjugation verbal-parameter) -> conjugation
 ;;;   verbal parameter : tense and person identifier ex: 'present-simple
 ;;; Stores information about a verb's conjugation
-(struct conjugation-kernel (verbal-parameter))
+(struct conjugation-kernel (form))
 (define conjugation
-  (lambda (verbal-parameter)
+  (lambda (form)
     (cond
-      [(not (or (equal? 'base verbal-parameter)
-                (equal? 'present-simple verbal-parameter)
-                (equal? 'past-simple verbal-parameter)
-                (equal? 'past-participle verbal-parameter)
-                (equal? 'present-participle verbal-parameter)))
-       (error "conjugation :" verbal-parameter)]
+      [(not (or (equal? 'base form)
+                (equal? 'present-simple form)
+                (equal? 'past-simple form)
+                (equal? 'past-participle form)
+                (equal? 'present-participle form)))
+       (error "conjugation :" form)]
       [else
-       (conjugation-kernel verbal-parameter)])))
+       (conjugation-kernel form)])))
 
 
 #| Declention Struct |#
@@ -458,7 +462,13 @@
 ;;;   dictionary : hash? formatted as noun dictionary
 ;;; If the given word is in the noun dictionary, it returns a word
 ;;;  struct with noun properties.  Othwerise, it returns #f
-
+(define string->noun
+  (lambda (str)
+    (cond [(number? (index-of (hash-ref noun-dictionary 'plural) str))
+           (word str (conjuclention "noun" (declention "plural")))]
+          [(number? (index-of (hash-ref noun-dictionary 'singular) str))
+           (word str (conjuclention "noun" (declention "singular")))]
+          [else #f])))
 
 
 
@@ -471,15 +481,15 @@
 (define string->verb
   (lambda (str dictionary)
     (cond [(number? (index-of str (hash-ref dictionary 'base)))
-           (list str 'base)]
+           (word str (conjuclension "verb" (conjugation 'infinitive)))]
           [(number? (index-of str (hash-ref dictionary 'present-simple)))
-           (list str 'present-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-simple))))]
+           (word str (conjuclension "verb" (conjugation 'present-simple)))]
           [(number? (index-of str (hash-ref dictionary 'past-simple)))
-           (list str 'past-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-simple))))]
+           (word str (conjuclension "verb" (conjugation 'past-simple)))]
           [(number? (index-of str (hash-ref dictionary 'past-participle)))
-           (list str 'past-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-participle))))]
+           (word str (conjuclension "verb" (conjugation 'past-participle)))]
           [(number? (index-of str (hash-ref dictionary 'present-participle)))
-           (list str 'present-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-participle))))]
+           (word str (conjuclension "verb" (conjugation 'present-participle)))]
           [else
            #f])))
 
