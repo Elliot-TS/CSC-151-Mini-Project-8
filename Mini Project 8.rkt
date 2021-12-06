@@ -19,16 +19,17 @@
 ;;; (conjugation form) -> conjugation
 ;;;   form : tense and person identifier ex: 'present-simple
 ;;; Stores information about a verb's conjugation
-(struct conjugation-kernel (form))
+(struct conjugation-kernel (form)
+  #:transparent)
 (define conjugation
   (lambda (form)
     (cond
       [(not (or (equal? 'base form)
                 (equal? 'present-simple form)
-                (equal? 'past-simple form
+                (equal? 'past-simple form)
                 (equal? 'past-participle form)
                 (equal? 'present-participle form)))
-       (error "conjugation :" verbal-parameter)]
+       (error "conjugation :" form)]
       [else
        (conjugation-kernel form)])))
 
@@ -51,7 +52,8 @@
 ;;;   * Possessive case is used for possession
 ;;;     - "That's his cake."
 ;;;     - "That cake is his."
-(struct declention-kernel (number))
+(struct declention-kernel (number)
+  #:transparent)
 
 (define declention
   (lambda (number)
@@ -80,7 +82,8 @@
 ;;;       (pronouns count as nouns)
 ;;;   conjucline : declention? or conjugation? or #f
 ;;; Stores information about a words part of speech and conjugation or declention
-(struct conjuclention-kernel (part-of-speech conjucline))
+(struct conjuclention-kernel (part-of-speech conjucline)
+  #:transparent)
 
 
 (define conjuclention
@@ -97,7 +100,7 @@
 
 
 
-(define sample-conjuc-verb (conjuclention "verb" (conjugation "third" "plural" "past")))
+(define sample-conjuc-verb (conjuclention "verb" (conjugation 'past-simple)))
 ;(test-true "conjuclention verb" (conjuclention-kernel? sample-conjuc-verb))
 
 
@@ -108,7 +111,8 @@
 ;;;   str : string?
 ;;;   conjuclention : conjuclention?
 ;;; Creates a word struct
-(struct word-kernel (str conjuclention))
+(struct word-kernel (str conjuclention)
+  #:transparent)
 
 (define word
   (lambda (wordstr conjuclention)
@@ -120,29 +124,49 @@
       [else
        (word-kernel wordstr conjuclention)])))
 ; (word "cat" (conjuclention "noun" (declention "singular" "female" "objective")))
-;;; not currently working but it will.
+
 
 
 
 
 #| Sentence Struct |#
 
+;;; (all-strings? lst) -> boolean
+;;;  lst : list
+;;; checks if every element in list is a string
+(define all-strings?
+  (lambda (lst)
+    (cond [(empty? lst) #t]
+          [(string? (first lst))
+           (all-strings? (cdr lst))]
+          [else #f])))
+
+;;; tests - these are done to check accuracy but also make sure speed is not too slow
+
+(test-true "long string list true" (all-strings? (make-list 2000 "cat")))
+(test-false "not all elements strings" (all-strings? '("cat" "kitten" 65)))
+(test-false "no elements strings" (all-strings? (make-list 2000 54)))
+
 ;;; (sentence-kernel words) -> sentence?
 ;;;   words : list? of word?
 ;;; Struct for storing information about each sentence
 
-(struct sentence-kernel (words))
+(struct sentence-kernel (words)
+  #:transparent)
 
-;;;/// each member of list should be str
+;;; (sentence sentences) -> void? or error
+;;;  sentences : list?
+;;; calls sentence-kernel if input can be applied to sentence-kernel
+;;; else returns error
 (define sentence
   (lambda (sentences)
     (cond
       [(not (list? sentences))
-       (error "sentence not words")]
+       (error "sentence not word list")]
+      [(not (all-strings? sentences))
+       (error "sentence list not all words")]
       [else
        (sentence-kernel sentences)])))
-
-
 
 
 #| Paragraph Struct |#
@@ -151,14 +175,21 @@
 ;;;   sentences: list? of sentences?
 ;;; Struct for storing information about each paragraph
 
-(struct paragraph-kernel (sentences))
+(struct paragraph-kernel (sentences)
+  #:transparent)
 
-;;; /// check if each element in list should be string . fix later
+;;; (paragraph sentences) -> void? or error
+;;;  sentences : list? of sentences?
+;;; checks if conditions for paragraph-kernel struct are met
+;;; if not, returns error.
+;;; if so, creates paragraph-kernel struct
 (define paragraph
   (lambda (sentences)
     (cond
       [(not (list? sentences))
        (error "paragraph not sentences")]
+      [(not (all-strings? sentences))
+       (error "sentences not strings")]
       [else
        (sentences)])))
 
@@ -466,17 +497,17 @@
 ;;; If the given word is in the verb dictionary, it returns a word
 ;;;  struct with noun properties.  Othwerise, it returns #f
 (define string->verb
-  (lambda (str dictionary)
-    (cond [(equal? str (hash-ref dictionary 'base))
+  (lambda (str)
+    (cond [(equal? str (hash-ref verb-dictionary 'base))
            (list str 'base)]
-          [(equal? str (hash-ref dictionary 'present-simple))
-           (list str 'present-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-simple))))]
-          [(equal? str (hash-ref dictionary 'past-simple))
-           (list str 'past-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-simple))))]
-          [(equal? str (hash-ref dictionary 'past-participle))
-           (list str 'past-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-participle))))]
-          [(equal? str (hash-ref dictionary 'present-participle))
-           (list str 'present-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-participle))))]
+          [(equal? str (hash-ref verb-dictionary 'present-simple))
+           (list str 'present-simple (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'present-simple))))]
+          [(equal? str (hash-ref verb-dictionary 'past-simple))
+           (list str 'past-simple (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'past-simple))))]
+          [(equal? str (hash-ref verb-dictionary 'past-participle))
+           (list str 'past-participle (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'past-participle))))]
+          [(equal? str (hash-ref verb-dictionary 'present-participle))
+           (list str 'present-participle (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'present-participle))))]
           [else
            #f])))
 
@@ -487,32 +518,32 @@
 ;;;  dictionary : the dictionary of pronouns
 ;;; takes a word and determines if it is a pronoun.
 (define string->pronoun
-  (lambda (str dictionary)
-    (cond [(equal? str (hash-ref dictionary '1S))
+  (lambda (str)
+    (cond [(equal? str (hash-ref pronoun-dictionary '1S))
            (list str '1S)]
-          [(equal? str (hash-ref dictionary '1P))
+          [(equal? str (hash-ref pronoun-dictionary '1P))
            (list str '1P)]
-          [(equal? str (hash-ref dictionary '2AS))
+          [(equal? str (hash-ref pronoun-dictionary '2AS))
            (list str '2AS)]
-          [(equal? str (hash-ref dictionary '2S))
+          [(equal? str (hash-ref pronoun-dictionary '2S))
            (list str '2S)]
-          [(equal? str (hash-ref dictionary '2P))
+          [(equal? str (hash-ref pronoun-dictionary '2P))
            (list str '2P)]
-          [(equal? str (hash-ref dictionary '3M))
+          [(equal? str (hash-ref pronoun-dictionary '3M))
            (list str '3M)]
-          [(equal? str (hash-ref dictionary '3F))
+          [(equal? str (hash-ref pronoun-dictionary '3F))
            (list str '3F)]
-          [(equal? str (hash-ref dictionary '3N))
+          [(equal? str (hash-ref pronoun-dictionary '3N))
            (list str '3N)]
-          [(equal? str (hash-ref dictionary '3P))
+          [(equal? str (hash-ref pronoun-dictionary '3P))
            (list str '3P)]
-          [(equal? str (hash-ref dictionary 'indefinite))
+          [(equal? str (hash-ref pronoun-dictionary 'indefinite))
            (list str 'indefinite)]
-          [(equal? str (hash-ref dictionary 'demonstrative))
+          [(equal? str (hash-ref pronoun-dictionary 'demonstrative))
            (list str 'demonstrative)]
-          [(equal? str (hash-ref dictionary 'interrogative))
+          [(equal? str (hash-ref pronoun-dictionary 'interrogative))
            (list str 'interrogative)]
-          [(equal? str (hash-ref dictionary 'relative))
+          [(equal? str (hash-ref pronoun-dictionary 'relative))
            (list str 'relative)]
           [else
            #f])))
@@ -525,10 +556,10 @@
 ;;; Converts a string to a word struct.
 ;;;  Assumes str contains one word
 (define string->word
-  (lambda (word)
-    (let ([noun? (string->noun word)]
-          [verb? (string->verb word)]
-          [pronoun? (string->pronoun word)])
+  (lambda (str)
+    (let ([noun? (string->noun str)]
+          [verb? (string->verb str)]
+          [pronoun? (string->pronoun str)])
       (cond
         [noun?
          noun?]
@@ -537,22 +568,64 @@
         [pronoun?
          pronoun?]
         [(index-of (hash-ref other-dictionary
-                             'adjective))
-         (word "adjective" null)]
+                             'adjective)
+                   str)
+         (str "adjective" null)]
         [(index-of (hash-ref other-dictionary
-                             'adverb))
-         (word "adverb" null)]
+                             'adverb)
+                   str)
+         (str "adverb" null)]
         [(index-of (hash-ref other-dictionary
-                             'preposition))
-         (word "preposition" null)]
+                             'preposition)
+                   str)
+         (str "preposition" null)]
         [(index-of (hash-ref other-dictionary
-                             'conjunction))
-         (word "conjunction" null)]
+                             'conjunction)
+                   str)
+         (str "conjunction" null)]
         [else
-         (word "unknown" null)]))))
+         (str "unknown" null)]))))
 
+
+
+;;; (string->words filename) ->
 (define string->words
-  (map string->word (file->paragraphs)))
+  (lambda (filename)
+  (map string->word (file->paragraphs (filename)))))
 
 
   #| OPTIONAL: SENTENCE ANALYSIS |#
+
+
+
+
+;;; DEMONSTRATIONS
+;;; could use in presentation
+#|
+
+(define samplenoun
+(string->word "cat"))
+
+> samplenoun
+#<word-kernel>
+
+> (word-kernel? samplenoun)
+#t
+
+> (word-kernel-str samplenoun)
+"cat"
+
+> (conjuclention-kernel-part-of-speech (word-kernel-conjuclention samplenoun))
+"noun"
+
+> (declention-kernel-number (conjuclention-kernel-conjucline (word-kernel-conjuclention samplenoun)))
+"singular"
+
+> (declention-kernel-number (conjuclention-kernel-conjucline (word-kernel-conjuclention (string->noun "cats"))))
+"plural"
+
+;;/// do one for verbs that shows root?
+
+;;; word struct includes original word?
+
+|#
