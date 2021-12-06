@@ -16,32 +16,21 @@
 
 #| Conjugation Struct |#
 
-;;; (conjugation person number tense) -> conjugation
-;;;   person : 'first, 'second, or 'third
-;;;   number : 'singular or 'plural
-;;;   tense : 'past or 'present
+;;; (conjugation form) -> conjugation
+;;;   form : tense and person identifier ex: 'present-simple
 ;;; Stores information about a verb's conjugation
-(struct conjugation-kernel (person number tense))
+(struct conjugation-kernel (form))
 (define conjugation
-  (lambda (person number tense)
+  (lambda (form)
     (cond
-      [(not (or (equal? "first" person)
-                (equal? "second" person)
-                (equal? "third" person)))
-       (error "conjugation : person" person)]
-      [(not (or (equal? "singular" number)
-                (equal? "plural" number)))
-       (error "conjugation : number" number)]
-      [(not (or (equal? "past" tense)
-                (equal? "present" tense)))
-       (error "conjugation : tense" tense)]
+      [(not (or (equal? 'base form)
+                (equal? 'present-simple form)
+                (equal? 'past-simple form
+                (equal? 'past-participle form)
+                (equal? 'present-participle form)))
+       (error "conjugation :" verbal-parameter)]
       [else
-       (conjugation-kernel person number tense)])))
-
-(define sample-con (conjugation "first" "singular" "present"))
-(test-true "sample conjugation" (conjugation-kernel? sample-con))
-
-
+       (conjugation-kernel form)])))
 
 
 #| Declention Struct |#
@@ -62,27 +51,25 @@
 ;;;   * Possessive case is used for possession
 ;;;     - "That's his cake."
 ;;;     - "That cake is his."
-(struct declention-kernel (number gender case))
+(struct declention-kernel (number))
 
 (define declention
-  (lambda (number gender case)
+  (lambda (number)
     (cond
       [(not (or (equal? "singular" number)
                 (equal? "plural" number)))
        (error "declention : number" number)]
-      [(not (or (equal? "male" gender)
-                (equal? "female" gender)))
-       (error "declention : gender" gender)]
-      [(not (or (equal? "possessive" case)
-                (equal? "objective" case)))
-       (error "declention : case" case)]
+      ;   [(not (or (equal? "male" gender)
+      ;             (equal? "female" gender)))
+      ;  (error "declention : gender" gender)]
+      ;  [(not (or (equal? "possessive" case)
+      ;           (equal? "objective" case)))
+      ; (error "declention : case" case)]
       [else
-       (declention-kernel number gender case)])))
+       (declention-kernel number)])))
 
-(define sample-dec (declention "singular" "female" "possessive"))
+(define sample-dec (declention "singular"))
 (test-true "sample declention" (declention-kernel? sample-dec))
-
-
 
 
 #| Conjuclention Struct |#
@@ -94,6 +81,7 @@
 ;;;   conjucline : declention? or conjugation? or #f
 ;;; Stores information about a words part of speech and conjugation or declention
 (struct conjuclention-kernel (part-of-speech conjucline))
+
 
 (define conjuclention
   (lambda (part-of-speech conjucline)
@@ -111,8 +99,6 @@
 
 (define sample-conjuc-verb (conjuclention "verb" (conjugation "third" "plural" "past")))
 ;(test-true "conjuclention verb" (conjuclention-kernel? sample-conjuc-verb))
-
-
 
 
 
@@ -134,7 +120,7 @@
       [else
        (word-kernel wordstr conjuclention)])))
 ; (word "cat" (conjuclention "noun" (declention "singular" "female" "objective")))
-;;; not currently working but it will. 
+;;; not currently working but it will.
 
 
 
@@ -190,15 +176,6 @@
 (define string->conjuclention
   (lambda (str)
     (declention 'singular 'neuter 'nominative)))
-
-;;; (string->word str) -> word?
-;;;    str : string?
-;;; Converts a string to a word struct.
-;;;  Assumes str contains one word
-(define string->word
-  (lambda (str)
-    (word str
-          (string->conjuclention str))))
 
 
 ;;; (string->words-list str) -> list? of string?
@@ -288,7 +265,7 @@
              '("I'm a little tea pot.\t short and stout"))
 (test-equal? "single new-line"
              (string->paragraph-list "I'm a little tea pot.\n short and stout")
-             '("I'm a little tea pot.\n short and stout"))                                    
+             '("I'm a little tea pot.\n short and stout"))
 
 ;;; (string->sentence str) -> sentence?
 ;;;   str : string?
@@ -345,8 +322,8 @@
 ;;; (file->verb-dictioary filename)
 ;;;   filename : string? that is a valid file name
 ;;; filename should be formatted as follows
-;;;   base1,present_simple1,past_simple1,past_participle1,present_participle1   
-;;;   base2,present_simple2,past_simple2,past_participle2,present_participle2   
+;;;   base1,present_simple1,past_simple1,past_participle1,present_participle1
+;;;   base2,present_simple2,past_simple2,past_participle2,present_participle2
 ;;;   ...
 ;;; Dictionay hash will be formatted as follows
 ;;;   '#hash(
@@ -359,7 +336,7 @@
   (lambda (filename)
     (hash 'base (csv->column-list filename 0)
           'present-simple (csv->column-list filename 1)
-          'past-simple (csv->column-list filename 2)          
+          'past-simple (csv->column-list filename 2)
           'past-participle (csv->column-list filename 3)
           'present-participle (csv->column-list filename 4))))
 
@@ -378,7 +355,7 @@
 ;;;   mine,ours,thine,yours,yours,his,hers,,theirs
 ;;;   myself,ourselves,thyself,yourself,yourselves,himself,herself,itself,themselves
 
-;;;   
+;;;
 ;;; other-pronouns should be formatted as follows
 ;;;   indefinite1,indefinite2,...
 ;;;   demonstrative1,demonstrative2,...
@@ -388,7 +365,7 @@
 ;;;   '#hash(
 ;;;     (1S . (nominative objective possessive-adjective possessive reflexive)) ; (1st singular)
 ;;;     (1P . (nominative objective possessive-adjective possessive reflexive)) ; (1st plural)
-;;;     (2AS . (nominative objective possessive-adjective possessive reflexive)) ; (2nd archaic singular) 
+;;;     (2AS . (nominative objective possessive-adjective possessive reflexive)) ; (2nd archaic singular)
 ;;;     (2S . (nominative objective possessive-adjective possessive reflexive)) ; (2nd singular)
 ;;;     (2P . (nominative objective possessive-adjective possessive reflexive)) ; (2nd plural)
 ;;;     (3M . (nominative objective possessive-adjective possessive reflexive)) ; (3rd masculine singular)
@@ -472,27 +449,33 @@
 ;;;   dictionary : hash? formatted as noun dictionary
 ;;; If the given word is in the noun dictionary, it returns a word
 ;;;  struct with noun properties.  Othwerise, it returns #f
+(define string->noun
+  (lambda (str)
+    (cond [(number? (index-of (hash-ref noun-dictionary 'plural) str))
+           (word str (conjuclention "noun" (declention "plural")))]
+          [(number? (index-of (hash-ref noun-dictionary 'singular) str))
+           (word str (conjuclention "noun" (declention "singular")))]
+          [else #f])))
 
 
 
 
 ;;; (string->verb str dictionary)
-;;;
-;;;
-;;; (conjugation verbal-parameter) -> conjugation
-;;;   verbal parameter : tense and person identifier ex: 'present-simple
-;;; Stores information about a verb's conjugation
+;;;   str : string? that is one word
+;;;   dictionary : hash? formatted as verb dictionary
+;;; If the given word is in the verb dictionary, it returns a word
+;;;  struct with noun properties.  Othwerise, it returns #f
 (define string->verb
   (lambda (str dictionary)
-    (cond [(number? (index-of str (hash-ref dictionary 'base)))
+    (cond [(equal? str (hash-ref dictionary 'base))
            (list str 'base)]
-          [(number? (index-of str (hash-ref dictionary 'present-simple)))
+          [(equal? str (hash-ref dictionary 'present-simple))
            (list str 'present-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-simple))))]
-          [(number? (index-of str (hash-ref dictionary 'past-simple)))
+          [(equal? str (hash-ref dictionary 'past-simple))
            (list str 'past-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-simple))))]
-          [(number? (index-of str (hash-ref dictionary 'past-participle)))
+          [(equal? str (hash-ref dictionary 'past-participle))
            (list str 'past-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-participle))))]
-          [(number? (index-of str (hash-ref dictionary 'present-participle)))
+          [(equal? str (hash-ref dictionary 'present-participle))
            (list str 'present-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-participle))))]
           [else
            #f])))
@@ -507,29 +490,29 @@
   (lambda (str dictionary)
     (cond [(equal? str (hash-ref dictionary '1S))
            (list str '1S)]
-          [(number? (index-of str (hash-ref dictionary '1P)))
+          [(equal? str (hash-ref dictionary '1P))
            (list str '1P)]
-          [(number? (index-of str (hash-ref dictionary '2AS)))
+          [(equal? str (hash-ref dictionary '2AS))
            (list str '2AS)]
-          [(number? (index-of str (hash-ref dictionary '2S)))
+          [(equal? str (hash-ref dictionary '2S))
            (list str '2S)]
-          [(number? (index-of str (hash-ref dictionary '2P)))
+          [(equal? str (hash-ref dictionary '2P))
            (list str '2P)]
-          [(number? (index-of str (hash-ref dictionary '3M)))
+          [(equal? str (hash-ref dictionary '3M))
            (list str '3M)]
-          [(number? (index-of str (hash-ref dictionary '3F)))
+          [(equal? str (hash-ref dictionary '3F))
            (list str '3F)]
-          [(number? (index-of str (hash-ref dictionary '3N)))
+          [(equal? str (hash-ref dictionary '3N))
            (list str '3N)]
-          [(number? (index-of str (hash-ref dictionary '3P)))
+          [(equal? str (hash-ref dictionary '3P))
            (list str '3P)]
-          [(number? (index-of str (hash-ref dictionary 'indefinite)))
+          [(equal? str (hash-ref dictionary 'indefinite))
            (list str 'indefinite)]
-          [(number? (index-of str (hash-ref dictionary 'demonstrative)))
+          [(equal? str (hash-ref dictionary 'demonstrative))
            (list str 'demonstrative)]
-          [(number? (index-of str (hash-ref dictionary 'interrogative)))
+          [(equal? str (hash-ref dictionary 'interrogative))
            (list str 'interrogative)]
-          [(number? (index-of str (hash-ref dictionary 'relative)))
+          [(equal? str (hash-ref dictionary 'relative))
            (list str 'relative)]
           [else
            #f])))
@@ -537,5 +520,39 @@
 
 
 
-;;; TODO Rewrite string->word to work using the above functions as well as the other words dictionary
-#| OPTIONAL: SENTENCE ANALYSIS |#
+;;; (string->word str) -> word?
+;;;    str : string?
+;;; Converts a string to a word struct.
+;;;  Assumes str contains one word
+(define string->word
+  (lambda (word)
+    (let ([noun? (string->noun word)]
+          [verb? (string->verb word)]
+          [pronoun? (string->pronoun word)])
+      (cond
+        [noun?
+         noun?]
+        [verb?
+         verb?]
+        [pronoun?
+         pronoun?]
+        [(index-of (hash-ref other-dictionary
+                             'adjective))
+         (word "adjective" null)]
+        [(index-of (hash-ref other-dictionary
+                             'adverb))
+         (word "adverb" null)]
+        [(index-of (hash-ref other-dictionary
+                             'preposition))
+         (word "preposition" null)]
+        [(index-of (hash-ref other-dictionary
+                             'conjunction))
+         (word "conjunction" null)]
+        [else
+         (word "unknown" null)]))))
+
+(define string->words
+  (map string->word (file->paragraphs)))
+
+
+  #| OPTIONAL: SENTENCE ANALYSIS |#
