@@ -119,7 +119,8 @@
     (cond
       [(not (string? wordstr))
        (error "word : expected string" wordstr)]
-      [(not (conjuclention-kernel? conjuclention))
+      [(not (or (conjuclention-kernel? conjuclention)
+                (null? conjuclention)))
        (error "word : expected conjuclention" conjuclention)]
       [else
        (word-kernel wordstr conjuclention)])))
@@ -498,16 +499,16 @@
 ;;;  struct with noun properties.  Othwerise, it returns #f
 (define string->verb
   (lambda (str)
-    (cond [(equal? str (hash-ref verb-dictionary 'base))
-           (list str 'base)]
-          [(equal? str (hash-ref verb-dictionary 'present-simple))
-           (list str 'present-simple (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'present-simple))))]
-          [(equal? str (hash-ref verb-dictionary 'past-simple))
-           (list str 'past-simple (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'past-simple))))]
-          [(equal? str (hash-ref verb-dictionary 'past-participle))
-           (list str 'past-participle (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'past-participle))))]
-          [(equal? str (hash-ref verb-dictionary 'present-participle))
-           (list str 'present-participle (list-ref (hash-ref verb-dictionary 'base) (index-of str (hash-ref verb-dictionary 'present-participle))))]
+    (cond [(index-of (hash-ref verb-dictionary 'base) str)
+           (word str (conjuclention "verb" (conjugation 'base)))]
+          [(index-of (hash-ref verb-dictionary 'present-simple) str)
+           (word str (conjuclention "verb" (conjugation 'present-simple)))]
+          [(index-of (hash-ref verb-dictionary 'past-simple) str)
+           (word str (conjuclention "verb" (conjugation 'past-simple)))]
+          [(index-of (hash-ref verb-dictionary 'past-participle) str )
+           (word str (conjuclention "verb" (conjugation 'past-participle)))]
+          [(index-of (hash-ref verb-dictionary 'present-participle) str)
+           (word str (conjuclention "verb" (conjugation 'present-participle)))]
           [else
            #f])))
 
@@ -570,21 +571,21 @@
         [(index-of (hash-ref other-dictionary
                              'adjective)
                    str)
-         (str "adjective" null)]
+         (word "adjective" null)]
         [(index-of (hash-ref other-dictionary
                              'adverb)
                    str)
-         (str "adverb" null)]
+         (word "adverb" null)]
         [(index-of (hash-ref other-dictionary
                              'preposition)
                    str)
-         (str "preposition" null)]
+         (word "preposition" null)]
         [(index-of (hash-ref other-dictionary
                              'conjunction)
                    str)
-         (str "conjunction" null)]
+         (word "conjunction" null)]
         [else
-         (str "unknown" null)]))))
+         (word "unknown" null)]))))
 
 
 
@@ -607,25 +608,6 @@
 (string->word "cat"))
 
 > samplenoun
-#<word-kernel>
-
-> (word-kernel? samplenoun)
-#t
-
-> (word-kernel-str samplenoun)
-"cat"
-
-> (conjuclention-kernel-part-of-speech (word-kernel-conjuclention samplenoun))
-"noun"
-
-> (declention-kernel-number (conjuclention-kernel-conjucline (word-kernel-conjuclention samplenoun)))
-"singular"
-
-> (declention-kernel-number (conjuclention-kernel-conjucline (word-kernel-conjuclention (string->noun "cats"))))
-"plural"
-
-;;/// do one for verbs that shows root?
-
-;;; word struct includes original word?
+(word-kernel "cat" (conjuclention-kernel "noun" (declention-kernel "singular")))
 
 |#
