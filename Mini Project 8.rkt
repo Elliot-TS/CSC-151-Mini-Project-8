@@ -479,13 +479,60 @@
 ;;; (string->verb str dictionary)
 ;;;
 ;;;
-
+;;; (conjugation verbal-parameter) -> conjugation
+;;;   verbal parameter : tense and person identifier ex: 'present-simple
+;;; Stores information about a verb's conjugation
+(define string->verb
+  (lambda (str dictionary)
+    (cond [(number? (index-of str (hash-ref dictionary 'base)))
+           (list str 'base)]
+          [(number? (index-of str (hash-ref dictionary 'present-simple)))
+           (list str 'present-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-simple))))]
+          [(number? (index-of str (hash-ref dictionary 'past-simple)))
+           (list str 'past-simple (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-simple))))]
+          [(number? (index-of str (hash-ref dictionary 'past-participle)))
+           (list str 'past-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'past-participle))))]
+          [(number? (index-of str (hash-ref dictionary 'present-participle)))
+           (list str 'present-participle (list-ref (hash-ref dictionary 'base) (index-of str (hash-ref dictionary 'present-participle))))]
+          [else
+           #f])))
 
 
 
 ;;; (string->pronoun str dictionary)
-;;;
-;;;
+;;;  str : string containing 1 word
+;;;  dictionary : the dictionary of pronouns
+;;; takes a word and determines if it is a pronoun.
+(define string->pronoun
+  (lambda (str dictionary)
+    (cond [(equal? str (hash-ref dictionary '1S))
+           (list str '1S)]
+          [(number? (index-of str (hash-ref dictionary '1P)))
+           (list str '1P)]
+          [(number? (index-of str (hash-ref dictionary '2AS)))
+           (list str '2AS)]
+          [(number? (index-of str (hash-ref dictionary '2S)))
+           (list str '2S)]
+          [(number? (index-of str (hash-ref dictionary '2P)))
+           (list str '2P)]
+          [(number? (index-of str (hash-ref dictionary '3M)))
+           (list str '3M)]
+          [(number? (index-of str (hash-ref dictionary '3F)))
+           (list str '3F)]
+          [(number? (index-of str (hash-ref dictionary '3N)))
+           (list str '3N)]
+          [(number? (index-of str (hash-ref dictionary '3P)))
+           (list str '3P)]
+          [(number? (index-of str (hash-ref dictionary 'indefinite)))
+           (list str 'indefinite)]
+          [(number? (index-of str (hash-ref dictionary 'demonstrative)))
+           (list str 'demonstrative)]
+          [(number? (index-of str (hash-ref dictionary 'interrogative)))
+           (list str 'interrogative)]
+          [(number? (index-of str (hash-ref dictionary 'relative)))
+           (list str 'relative)]
+          [else
+           #f])))
 
 
 
